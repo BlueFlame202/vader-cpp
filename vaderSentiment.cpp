@@ -1,0 +1,2 @@
+#include "vaderSentiment.hpp"
+// implements 
