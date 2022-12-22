@@ -326,7 +326,7 @@ namespace vader
 		// want separate positive versus negative sentiment scores
 		double pos_sum = 0.0;
 		double neg_sum = 0.0;
-		int neu_count = 0;
+		double neu_count = 0;
 		for (double sentiment_score : sentiments)
 		{
 			if (sentiment_score > 0)

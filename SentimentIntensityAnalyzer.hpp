@@ -16,7 +16,7 @@ namespace vader
         std::unordered_map<String, String> m_emojis;
 
     public:
-        SentimentIntensityAnalyzer(std::string lexicon_file="A:\\Documents\\Research\\vaderSentimentCpp\\vader_lexicon.txt", std::string emoji_lexicon="A:\\Documents\\Research\\vaderSentimentCpp\\emoji_utf8_lexicon.txt");
+        SentimentIntensityAnalyzer(std::string lexicon_file="vader_lexicon.txt", std::string emoji_lexicon="emoji_utf8_lexicon.txt");
         ~SentimentIntensityAnalyzer();
 
         Sentiment polarity_scores(String text);

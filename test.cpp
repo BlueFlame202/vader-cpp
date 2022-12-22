@@ -21,6 +21,6 @@ int main()
 	vader::SentimentIntensityAnalyzer vader;
 	vader::Sentiment res = vader.polarity_scores(s);
 	std::cout << res.compound << ", " << res.neg << ", " << res.neu << ", " << res.pos << std::endl;
-	std::cin.get();
+
     return 0;
 }
