@@ -16,11 +16,11 @@ namespace vader
         std::unordered_map<String, String> m_emojis;
 
     public:
-        SentimentIntensityAnalyzer(std::string lexicon_file="vader_lexicon.txt", std::string emoji_lexicon="emoji_utf8_lexicon.txt");
+        SentimentIntensityAnalyzer(std::string lexicon_file="A:\\Documents\\Research\\vaderSentimentCpp\\vader_lexicon.txt", std::string emoji_lexicon="A:\\Documents\\Research\\vaderSentimentCpp\\emoji_utf8_lexicon.txt");
         ~SentimentIntensityAnalyzer();
 
         Sentiment polarity_scores(String text);
-        double sentiment_valence(double valence, SentiText sentitext, String item, int i, std::vector<double> &sentiments);
+        void sentiment_valence(double valence, SentiText sentitext, String item, int i, std::vector<double> &sentiments);
 
     private:
         static int char_byte_count(Char val);
@@ -28,7 +28,7 @@ namespace vader
         void make_lex_dict();
         void make_emoji_dict();
         
-        double _least_check(double valance, const std::vector<String> &words_and_emoticons, int i);
+        double _least_check(double valence, const std::vector<String> &words_and_emoticons, int i);
         static void _but_check(const std::vector<String> &words_and_emoticons, std::vector<double> &sentiments);
         static double _special_idioms_check(double valence, const std::vector<String> &words_and_emoticons, int i);
         static double _sentiment_laden_idioms_check(double valence, SentiText senti_text_lower); // future work

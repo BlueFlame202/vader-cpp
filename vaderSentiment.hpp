@@ -30,6 +30,7 @@ Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <cctype>
 
 // char8_t backwards compatibility https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1423r2.html
 #if defined(__cpp_lib_char8_t)
@@ -66,6 +67,32 @@ inline std::vector<String> split(String s)
     }
     return res;
 }
+
+inline std::vector<String> split(String s, Char splitter)
+{
+	std::vector<String> res;
+	bool n = true;
+	unsigned int i = -1;
+	for (Char c : s)
+	{
+		if (n)
+		{
+			String strversion = u8"";
+			strversion.push_back(c);
+			res.push_back(strversion);
+			i++;
+			n = false;
+		}
+		else
+		{
+			if (c == splitter)
+				n = true;
+			else
+				res[i].push_back(c); // possibly better to get rid of i and just do res.size() - 1
+		}
+	}
+	return res;
+}
 #else
 typedef std::string String;
 typedef unsigned char Char;
@@ -100,6 +127,32 @@ inline std::vector<std::string> split(std::string s)
         }
     }
     return res;
+}
+
+inline std::vector<std::string> split(std::string s, unsigned char splitter)
+{
+	std::vector<std::string> res;
+	bool n = true;
+	unsigned int i = -1;
+	for (char c : s)
+	{
+		if (n)
+		{
+			std::string strversion = "";
+			strversion.push_back(c);
+			res.push_back(strversion);
+			i++;
+			n = false;
+		}
+		else
+		{
+			if (c == splitter)
+				n = true;
+			else
+				res[i].push_back(c); // possibly better to get rid of i and just do res.size() - 1
+		}
+	}
+	return res;
 }
 
 namespace vader

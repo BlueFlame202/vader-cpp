@@ -1,5 +1,6 @@
 // implements SentiText class
 #include "SentiText.hpp"
+#include <string>
 
 namespace vader
 {
