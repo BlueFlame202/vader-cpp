@@ -32,6 +32,7 @@ Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.
 #include <algorithm>
 #include <cctype>
 
+
 // char8_t backwards compatibility https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1423r2.html
 #if defined(__cpp_lib_char8_t)
 typedef std::u8string String;
@@ -94,8 +95,8 @@ inline std::vector<String> split(String s, Char splitter)
 	return res;
 }
 #else
-typedef std::string String;
 typedef unsigned char Char;
+typedef std::string String;
 
 inline std::string from_u8string(const String &s) 
 {
@@ -103,16 +104,17 @@ inline std::string from_u8string(const String &s)
 }
 #endif
 
+
 inline std::vector<std::string> split(std::string s)
 {
     std::vector<std::string> res;
     bool n = true;
     unsigned int i = -1; 
-    for (char c : s)
+    for (Char c : s)
     {
         if (n)
         {
-            std::string strversion = "";
+            std::string strversion = u8"";
             strversion.push_back(c);
             res.push_back(strversion);
             i++;
@@ -134,11 +136,11 @@ inline std::vector<std::string> split(std::string s, unsigned char splitter)
 	std::vector<std::string> res;
 	bool n = true;
 	unsigned int i = -1;
-	for (char c : s)
+	for (Char c : s)
 	{
 		if (n)
 		{
-			std::string strversion = "";
+			std::string strversion = u8"";
 			strversion.push_back(c);
 			res.push_back(strversion);
 			i++;
@@ -203,20 +205,20 @@ namespace vader
         {u8"occasional", B_DECR}, {u8"occasionally", B_DECR}, {u8"partly", B_DECR},
         {u8"scarce", B_DECR}, {u8"scarcely", B_DECR}, {u8"slight", B_DECR}, {u8"slightly", B_DECR}, {u8"somewhat", B_DECR},
         {u8"sort of", B_DECR}, {u8"sorta", B_DECR}, {u8"sortof", B_DECR}, {u8"sort-of", B_DECR}};
-    /*
+    
     // check for sentiment laden idioms that do not contain lexicon words (future work, not yet implemented)
-    #define SENTIMENT_LADEN_IDIOMS {u8"cut the mustard": 2, u8"hand to mouth": -2,
-                            u8"back handed": -2, u8"blow smoke": -2, u8"blowing smoke": -2,
-                            u8"upper hand": 1, u8"break a leg": 2,
-                            u8"cooking with gas": 2, u8"in the black": 2, u8"in the red": -2,
-                            u8"on the ball": 2, u8"under the weather": -2}
+	static std::unordered_map<String, double> SENTIMENT_LADEN_IDIOMS{ {u8"cut the mustard", 2}, {u8"hand to mouth", -2},
+		{u8"back handed", -2}, {u8"blow smoke", -2}, {u8"blowing smoke", -2},
+		{u8"upper hand", 1}, {u8"break a leg", 2},
+		{u8"cooking with gas", 2}, {u8"in the black", 2}, {u8"in the red" , -2},
+		{u8"on the ball", 2}, {u8"under the weather", -2} };
 
     // check for special case idioms and phrases containing lexicon words
-    #define SPECIAL_CASES {u8"the shit": 3, u8"the bomb": 3, u8"bad ass": 1.5, u8"badass": 1.5, u8"bus stop": 0.0,
-                    u8"yeah right": -2, u8"kiss of death": -1.5, u8"to die for": 3,
-                    u8"beating heart": 3.1, u8"broken heart": -2.9 }
+	static std::unordered_map<String, double> SPECIAL_CASES {{u8"the shit", 3}, {u8"the bomb", 3}, {u8"bad ass", 1.5}, {u8"badass", 1.5}, {u8"bus stop", 0.0},
+					{u8"yeah right", -2}, {u8"kiss of death", -1.5}, {u8"to die for", 3},
+					{u8"beating heart", 3.1}, {u8"broken heart", -2.9}};
 
-    */
+    
 
     // Static Methods
 
@@ -261,7 +263,7 @@ namespace vader
         */
         int allcap_words = 0;
         for (String word : words)
-            if (std::all_of(word.begin(), word.end(), ::isupper))//[](unsigned char c){ return std::isupper(c); }))
+            if (std::all_of(word.begin(), word.end(), [](unsigned char c){ return ::isupper(c); }))
                 allcap_words++;
         int cap_differential = words.size() - allcap_words; // this is actually possibly buggy, behavior on emojis/emoticons are unknown TODO: investigate
         return 0 < cap_differential && cap_differential < words.size(); // more space efficient than storing in a variable
@@ -279,9 +281,9 @@ namespace vader
             if (valence < 0)
                 scalar *= -1;
             // check if booster/dampener word is ALLCAPS (while others aren't)
-            if (is_cap_diff && std::all_of(oword.begin(), oword.end(), ::isupper))
+            if (is_cap_diff && std::all_of(oword.begin(), oword.end(), [](unsigned char c) { return ::isupper(c); }))
             {
-                if (valence > 0)
+                if (valence > 0) // should be scalar > 0?
                     scalar += C_INCR;
                 else
                     scalar -= C_INCR;

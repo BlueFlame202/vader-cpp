@@ -1,5 +1,6 @@
 // implements SentimentIntensityAnalyzer class
 #include "SentimentIntensityAnalyzer.hpp"
+#include "cppemojihandler.hpp"
 
 extern std::string from_u8string(const String &s);
 
@@ -11,6 +12,8 @@ namespace vader
 		this->m_emoji_full_filepath = emoji_lexicon;
 		this->make_lex_dict();
 		this->make_emoji_dict();
+
+		this->m_emoji_bank = create_emoji_bank(m_emojis);
 	}
 
 	SentimentIntensityAnalyzer::~SentimentIntensityAnalyzer()
@@ -22,9 +25,21 @@ namespace vader
 		// convert emojis to their textual descriptions
 		String text_no_emoji = u8"";
 		bool prev_space = true;
-		for (Char c : text)
+		for (int i = 0; i < text.length(); i++) // Char c : text
 		{
-			String temp = ""; temp.push_back(c);
+			Char c = text[i];
+			String temp = u8""; temp.push_back(c);
+			if (this->m_emoji_bank[0].count(c))
+				temp = emoji_chars_from_start(text.substr(i), this->m_emoji_bank);
+			if (temp.length() > 0 && this->m_emojis.count(temp))
+			{
+				String description = this->m_emojis[temp];
+				if (!prev_space)
+					text_no_emoji += u8" ";
+				text_no_emoji += description + u8" "; // so that emoji sentiments can be parsed separately
+				prev_space = true;
+			}
+			/*
 			if (this->m_emojis.count(temp) > 0)
 			{
 				// get teh textual description
@@ -33,14 +48,17 @@ namespace vader
 					text_no_emoji += u8" ";
 				text_no_emoji += description;
 				prev_space = false;
-			}
-			else
+			}*/
+			else if (!(prev_space && temp == u8" "))
 			{
 				text_no_emoji += temp;
 				prev_space = c == u8' ';
 			}
+			i += temp.length() - 1;
 		}
-		text.erase(text.length() - 1);
+		if (text_no_emoji[text_no_emoji.length() - 1] == u8' ')
+			text_no_emoji.erase(text_no_emoji.length() - 1);
+		text = text_no_emoji;
 
 		SentiText sentitext(text);
 		std::vector<double> sentiments;
@@ -61,7 +79,7 @@ namespace vader
 			}
 			if (BOOSTER_DICT.count(lword) > 0)
 				sentiments.push_back(valence);
-			else if (i < words_and_emoticons.size() - 1 && lword == "kind" && lnword == "of")
+			else if (i < words_and_emoticons.size() - 1 && lword == u8"kind" && lnword == u8"of")
 				sentiments.push_back(valence);
 			else
 				this->sentiment_valence(valence, sentitext, words_and_emoticons[i], i, sentiments);
@@ -93,7 +111,7 @@ namespace vader
 		String line;
 		while (std::getline(in_file, line))
 		{
-			if (line == "")
+			if (line == u8"")
 				continue;
 			std::vector<String> tokens = split(line, u8'\t');
 			String word = tokens[0];
@@ -109,7 +127,7 @@ namespace vader
 		String line;
 		while (std::getline(in_file, line))
 		{
-			if (line == "")
+			if (line == u8"")
 				continue;
 			std::vector<String> tokens = split(line, u8'\t');
 			String emoji = tokens[0];
@@ -139,11 +157,11 @@ namespace vader
 			}
 
 			// check for "no" as negation for an adjacent lexicon item vs "no" as its own stand-alone lexicon item
-			if (item_lowercase == "no" && i != words_and_emoticons.size() - 1 && this->m_lexicon.count(next_word) > 0)
+			if (item_lowercase == u8"no" && i != words_and_emoticons.size() - 1 && this->m_lexicon.count(next_word) > 0)
 				// don't use valence of "no" as a lexicon item. Instead set it's valence to 0.0 and negate the next item
 				valence = 0.0;
 			// check if sentiment laden word is in ALL CAPS (while others aren't)
-			if (std::all_of(item.begin(), item.end(), ::isupper))
+			if (std::any_of(item.begin(), item.end(), [](unsigned char c) { return ::isupper(c); }) && is_cap_diff)
 			{
 				if (valence > 0)
 					valence += C_INCR;
@@ -158,20 +176,19 @@ namespace vader
 				// on their distance from the current item.
 
 				// TOOD: consider switching SentiText to include a m_l_words_and_emoticons so everything is already in loewr case
-				String temp;
 				if (i > start_i)
 				{
 					String temp = words_and_emoticons[i - (start_i + 1)];
 					std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
 					if (m_lexicon.count(temp) == 0)
 					{
-						double s = scalar_inc_dec(temp, valence, is_cap_diff);
+						double s = scalar_inc_dec(words_and_emoticons[i - (start_i + 1)], valence, is_cap_diff);
 						if (s != 0)
 						{
 							if (start_i == 1)
 								s *= 0.95;
 							else if (start_i == 2)
-								s *-0.9;
+								s *= 0.9;
 						}
 						valence = valence + s;
 						valence = this->_negation_check(valence, words_and_emoticons, start_i, i);
@@ -199,10 +216,13 @@ namespace vader
 			llword = words_and_emoticons[i - 2];
 			std::transform(llword.begin(), llword.end(), llword.begin(), ::tolower);
 		}
-		if (/*this->m_lexicon.count(lword) > 0 &&*/ lword == u8"least") // I don't know why they check if its in the lexicon
+		if (/*this->m_lexicon.count(lword) == 0 &&*/ lword == u8"least") // I don't know why they check if its not in the lexicon
 		{
-			if (i > 1 && llword != u8"at" && llword != u8"very")
-				valence *= N_SCALAR;
+			if (i > 1)
+			{
+				if (llword != u8"at" && llword != u8"very")
+					valence *= N_SCALAR;
+			}
 			else if (i > 0)
 				valence *= N_SCALAR;
 		}
@@ -238,8 +258,50 @@ namespace vader
 		}
 	}
 
-	double SentimentIntensityAnalyzer::_special_idioms_check(double valence, const std::vector<String> &words_and_emoticons, int i) // TODO
+	double SentimentIntensityAnalyzer::_special_idioms_check(double valence, const std::vector<String> &words_and_emoticons, int i)
 	{
+		std::vector<String> words_and_emoticons_lower;
+		for (String word : words_and_emoticons)
+		{
+			std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+			words_and_emoticons_lower.push_back(word);
+		}
+
+		String onezero = words_and_emoticons_lower[i - 1] + u8' ' + words_and_emoticons_lower[i];
+		String twoonezero = words_and_emoticons_lower[i - 2] + u8' ' + onezero;
+		String twoone = words_and_emoticons_lower[i - 2] + u8' ' + words_and_emoticons_lower[i - 1];
+		String threetwoone = words_and_emoticons_lower[i - 3] + u8' ' + twoone;
+		String threetwo = words_and_emoticons_lower[i - 3] + u8' ' + words_and_emoticons_lower[i - 2];
+		String sequences[5] = { onezero, twoonezero, twoone, threetwoone, threetwo };
+
+		for (String seq : sequences)
+		{
+			if (SPECIAL_CASES.count(seq) > 0)
+			{
+				valence = SPECIAL_CASES[seq];
+				break; // TODO: code without breaks
+			}
+		}
+
+		if (words_and_emoticons_lower.size() - 1 > i)
+		{
+			String zeroone = words_and_emoticons_lower[i] + u8' ' + words_and_emoticons_lower[i + 1];
+			if (SPECIAL_CASES.count(zeroone))
+				valence = SPECIAL_CASES[zeroone];
+			if (words_and_emoticons_lower.size() - 1 > i + 1)
+			{
+				String zeroonetwo = zeroone + u8' ' + words_and_emoticons[i + 2];
+				if (SPECIAL_CASES.count(zeroonetwo))
+					valence = SPECIAL_CASES[zeroone];
+			}
+		}
+
+		// check for booster/dampener bi-grams such as 'sort of' or 'kind of'
+		String n_grams[3] = { threetwoone, threetwo, twoone };
+		for (String n_gram : n_grams)
+			if (BOOSTER_DICT.count(n_gram) > 0)
+				valence = valence + BOOSTER_DICT[n_gram];
+
 		return valence;
 	}
 
@@ -257,8 +319,8 @@ namespace vader
 			words_and_emoticons_lower.push_back(word);
 		}
 		std::vector<String> temp;
-		if (0 < i - (start_i)+1 && i - (start_i)+1 < words_and_emoticons_lower.size())
-			temp.push_back(words_and_emoticons_lower[i - (start_i)+1]);
+		if (0 <= i - (start_i+1) && i - (start_i+1) < words_and_emoticons_lower.size())
+			temp.push_back(words_and_emoticons_lower[i - (start_i+1)]);
 		if (start_i == 0)
 		{
 			if (negated(temp)) // 1 word preceding lexicon word (w/o stopwords)

@@ -1,6 +1,7 @@
 // vader::SentimentIntensityAnalyzer class header
 
 #pragma once
+#pragma execution_character_set("utf-8")
 
 #include "SentiText.hpp"
 
@@ -14,6 +15,7 @@ namespace vader
 
         std::unordered_map<String, double> m_lexicon;
         std::unordered_map<String, String> m_emojis;
+		std::vector<std::unordered_set<Char>> m_emoji_bank;
 
     public:
         SentimentIntensityAnalyzer(std::string lexicon_file="A:\\Documents\\Research\\vaderSentimentCpp\\vader_lexicon.txt", std::string emoji_lexicon="A:\\Documents\\Research\\vaderSentimentCpp\\emoji_utf8_lexicon.txt");

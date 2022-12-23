@@ -32,13 +32,13 @@ namespace vader
         // Removes all trailing and leading punctuation 
         // If the resulting string has two or fewer characters, then it was likely an emoticon, so return original string (ie ":)" stripped would be "", so just return ":)"
         String punctuation = u8"!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-        String copy = token;
+		String copy = token;
         token.erase(std::remove_if(token.begin(), 
                               token.end(),
-                              [](unsigned char x){return std::ispunct(x);}),
+                              [](unsigned char x){return std::ispunct(x) && x != '\'';}), // to leave contractions in, this is different than the original.
                               token.end());
-        if (token.length() <= 2)
-            return copy;
+		if (token.length() <= 2)
+			token = copy;
         return token;
     }
 
