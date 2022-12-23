@@ -1,6 +1,6 @@
 # VADER Sentiment Analysis in C++
 
-VADER (Valence Aware Dictionary and sEntiment Reasoner) is a lexicon and rule-based tool that is designed to measure sentiments expressed in social media. The original tool was built in Python; this is a port of the original to C++. It is designed to be faster for large data sets. The current version of the program is v1.0.0. Benchmarks and further testing and improvements will continue to improve the speed and accuracy of the code. As the original project was open-sourced under the MIT License, so is this project. Attributions are appreciated, but no authors may be held liable.
+VADER (Valence Aware Dictionary and sEntiment Reasoner) is a lexicon and rule-based tool that is designed to measure sentiments expressed in social media. The original tool was built in Python; this is a port of the original to C++. It is designed to be faster for large data sets. The current version of the program is v1.0.0. Benchmarks and further testing and improvements will continue to improve the speed and accuracy of the code. As the original project was open-sourced under the MIT License, so is this project. Attributions are appreciated, but no authors may be held liable for claims, damages, or other liabilities as described by the license.
 
 ## Table of Contents
   * [Table of Contents](#table-of-contents)
