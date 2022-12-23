@@ -214,3 +214,7 @@ The values here mostly match those of the original VADER tool in Python. Any dif
 ## Other Information
 
 For more information on the VADER Sentiment tool or to find the original papers and work, please see [the original Python version](https://github.com/cjhutto/vaderSentiment).
+
+## Contact
+
+To contact me, please email aathreyakadambi@gmail.com.
