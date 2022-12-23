@@ -12,6 +12,7 @@ namespace vader
     private:
         String m_text;
         std::vector<String> m_words_and_emoticons;
+		bool * m_is_emoticon;
         bool m_is_cap_diff;
 
     public:
@@ -19,10 +20,11 @@ namespace vader
         ~SentiText();
 
         std::vector<String> * get_words_and_emoticons();
+		const bool * get_is_emoticon();
         bool isCapDiff();
 
     private:
-        static String _strip_punc_if_word(String &token);
+		String _strip_punc_if_word(String &token, int i);
         std::vector<String> _words_and_emoticons();
     };
 }

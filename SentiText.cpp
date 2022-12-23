@@ -21,13 +21,18 @@ namespace vader
     {
         return &m_words_and_emoticons;
     }
+
+	const bool * SentiText::get_is_emoticon()
+	{
+		return m_is_emoticon;
+	}
     
     bool SentiText::isCapDiff()
     {
         return m_is_cap_diff;
     }
 
-    String SentiText::_strip_punc_if_word(String &token)
+    String SentiText::_strip_punc_if_word(String &token, int i) // TODO: modify so it returns a pair<String, bool> so that this method can be static and then modify _words_and_emoticons as necessary
     {
         // Removes all trailing and leading punctuation 
         // If the resulting string has two or fewer characters, then it was likely an emoticon, so return original string (ie ":)" stripped would be "", so just return ":)"
@@ -38,7 +43,12 @@ namespace vader
                               [](unsigned char x){return std::ispunct(x) && x != '\'';}), // to leave contractions in, this is different than the original.
                               token.end());
 		if (token.length() <= 2)
+		{
 			token = copy;
+			this->m_is_emoticon[i] = true;
+		}
+		else
+			this->m_is_emoticon[i] = false;
         return token;
     }
 
@@ -48,8 +58,9 @@ namespace vader
         // Leaves contractions and most emoticons
         // Does not preserve punc-plus-letter emoticons (e.g. :D)
         std::vector<String> wes = split(m_text);
-        for (String &s : wes)
-            _strip_punc_if_word(s);
+		m_is_emoticon = new bool[wes.size()];
+        for (int i = 0; i < wes.size(); i++)
+            _strip_punc_if_word(wes[i], i);
         return wes;
     }
 }

@@ -157,6 +157,12 @@ inline std::vector<std::string> split(std::string s, unsigned char splitter)
 	return res;
 }
 
+
+inline bool isupper(String word)
+{
+	return std::all_of(word.begin(), word.end(), [](unsigned char c) { return (!::isalpha(c)) || ::isupper(c); }) && std::any_of(word.begin(), word.end(), [](unsigned char c) { return ::isalpha(c); });
+}
+
 namespace vader
 {
     // Precomiled Constants
@@ -263,7 +269,7 @@ namespace vader
         */
         int allcap_words = 0;
         for (String word : words)
-            if (std::all_of(word.begin(), word.end(), [](unsigned char c){ return ::isupper(c); }))
+            if (isupper(word))
                 allcap_words++;
         int cap_differential = words.size() - allcap_words; // this is actually possibly buggy, behavior on emojis/emoticons are unknown TODO: investigate
         return 0 < cap_differential && cap_differential < words.size(); // more space efficient than storing in a variable
@@ -281,7 +287,7 @@ namespace vader
             if (valence < 0)
                 scalar *= -1;
             // check if booster/dampener word is ALLCAPS (while others aren't)
-            if (is_cap_diff && std::all_of(oword.begin(), oword.end(), [](unsigned char c) { return ::isupper(c); }))
+            if (is_cap_diff && isupper(oword))
             {
                 if (valence > 0) // should be scalar > 0?
                     scalar += C_INCR;

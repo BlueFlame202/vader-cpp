@@ -8,6 +8,8 @@
 
 int main()
 {
+	std::cout << std::isupper(':') << std::endl;
+
 	String sentences[16] = 
 	{
 		u8"VADER is smart, handsome, and funny.", // positive sentence example

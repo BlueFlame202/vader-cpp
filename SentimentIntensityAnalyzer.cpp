@@ -160,7 +160,7 @@ namespace vader
 				// don't use valence of "no" as a lexicon item. Instead set it's valence to 0.0 and negate the next item
 				valence = 0.0;
 			// check if sentiment laden word is in ALL CAPS (while others aren't)
-			if (std::any_of(item.begin(), item.end(), [](unsigned char c) { return ::isupper(c); }) && is_cap_diff)
+			if (isupper(item) && is_cap_diff && !sentitext.get_is_emoticon()[i])
 			{
 				if (valence > 0)
 					valence += C_INCR;
