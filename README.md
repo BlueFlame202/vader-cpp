@@ -209,7 +209,7 @@ The output for the above example is:
 ----------------------------------------------------
 ```
 
-The values here mostly match those of the original VADER tool in Python. Any differences result from those mentioned in the [Discrepencies section above](#Discrepencies-Between-the-Python-and-C++-Versions).
+The values here mostly match those of the original VADER tool in Python. Any differences result from those mentioned in the [Discrepencies section above](#Discrepencies-Between-the-Python-and-Cpp-Versions).
 
 ## Other Information
 
