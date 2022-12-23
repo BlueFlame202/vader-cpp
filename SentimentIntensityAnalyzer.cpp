@@ -137,7 +137,6 @@ namespace vader
 		}
 	}
 
-	// TODO Possible: switch from &sentiments to * sentiments
 	void SentimentIntensityAnalyzer::sentiment_valence(double valence, SentiText sentitext, String item, int i, std::vector<double> &sentiments)
 	{
 		bool is_cap_diff = sentitext.isCapDiff();
