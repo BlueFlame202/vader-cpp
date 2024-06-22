@@ -12,7 +12,7 @@ VADER (Valence Aware Dictionary and sEntiment Reasoner) is a lexicon and rule-ba
     + [Future Changes](#future-changes)
     + [Time Complexities](#time-complexities)
   * [Cpp Demo and Code Examples](#cpp-demo-and-code-examples)
-  * [Other Information](#other-information)
+  * [Other Information and Acknowledgements](#other-information)
   * [Contact](#contact)
 
 ## Discrepencies Between the Python and Cpp Versions
@@ -213,9 +213,11 @@ The output for the above example is:
 
 The values here mostly match those of the original VADER tool in Python. Any differences result from those mentioned in the [Discrepencies section above](#Discrepencies-Between-the-Python-and-Cpp-Versions).
 
-## Other Information
+## Other Information and Acknowledgements
 
 For more information on the VADER Sentiment tool or to find the original papers and work, please see [the original Python version](https://github.com/cjhutto/vaderSentiment).
+
+Thank you to Professor Fedyk at UC Berkeley and Mohsen Chowdhury for mentoring me on the project for which I developed this tool.
 
 ## Contact
 
