@@ -12,7 +12,7 @@ VADER (Valence Aware Dictionary and sEntiment Reasoner) is a lexicon and rule-ba
     + [Future Changes](#future-changes)
     + [Time Complexities](#time-complexities)
   * [Cpp Demo and Code Examples](#cpp-demo-and-code-examples)
-  * [Other Information and Acknowledgements](#other-information)
+  * [Other Information and Acknowledgements](#other-information-and-acknowledgements)
   * [Contact](#contact)
 
 ## Discrepencies Between the Python and Cpp Versions
